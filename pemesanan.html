@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemesanan</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    
+</head>
+<body>
+  <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+    <!-- Brand -->
+    <a class="navbar-brand" href="index.html">UNAI MAINTENANCE</a>
+  
+    <!-- Toggler/collapsibe Button -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  
+    <!-- Navbar links -->
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="dorm.html">Dorm</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="mahasiswa.html">Mahasiswa</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="pemesanan.html">Pemesanan</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+    <div id="app">
+
+        <div class="container">
+            <div class="py-5 text-center">
+              <h2>List Pemesanan</h2>
+              <!-- <p class="lead">Below is an example of CRUD operation using VueJS</p> -->
+            </div>
+      
+              <div class="col-md-12">
+                <h4 class="mb-3">pemesanan Data  <button class="btn btn-md btn-primary" v-on:click="resetForm()">Create new pemesanan </button>
+                </h4>
+                <table class="table table-striped">
+                    <tr>
+                        <th>ID</th>
+                        <th>Nama</th>
+                        <th>No Kamar</th>
+                        <th>Gedung</th>
+                        <th>Foto</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                    </tr>
+                    <tr v-for="pemesanan in pemesanans">
+                        <td>{{ pemesanan.id }}</td>
+                        <td>{{ pemesanan.nama }}</td>
+                        <td>{{ pemesanan.noKamar }}</td>
+                        <td>{{ pemesanan.gedung }}</td>
+                        <td><img :src="pemesanan.foto" style="width: 100px;"></td>
+                        <td><button class="btn btn-md btn-warning" v-on:click="getEdit(pemesanan)">Edit</button></td>
+                        <td><button class="btn btn-danger" v-on:click="getDelete(pemesanan)">Delete</button></td>
+                    </li>
+                </table>
+
+                <div v-if="message" class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+                
+            
+                <h4 class="mb-3">pemesanan Information</h4>
+                <form class="needs-validation" novalidate>
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label for="nama">First name</label>
+                      <input  v-model="nama" type="text" class="form-control" id="nama" placeholder="" value="" required>
+                      <div class="invalid-feedback">
+                        Valid first name is required.
+                      </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label for="noKamar">Last name</label>
+                      <input v-model="noKamar" type="text" class="form-control" id="noKamar" placeholder="" value="" required>
+                      <div class="invalid-feedback">
+                        Valid last name is required.
+                      </div>
+                    </div>
+                  </div>
+      
+                  <div class="mb-3">
+                    <label for="gedung">gedung</label>
+                    <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">@</span>
+                      </div>
+                      <input v-model="gedung" type="text" class="form-control" id="gedung" placeholder="gedung" required>
+                      <div class="invalid-feedback" style="width: 100%;">
+                        Your gedung is required.
+                      </div>
+                    </div>
+                  </div>
+      
+                  <div class="mb-3">
+                    <label for="foto">foto <span class="text-muted">(Optional)</span></label>
+                    <input v-model="foto" type="foto" class="form-control" id="foto" placeholder="you@example.com">
+                    <div class="invalid-feedback">
+                      Please enter a valid foto address for shipping updates.
+                    </div>
+                  </div>
+      
+                  </div>
+                
+                  <hr class="mb-4">
+                  <button v-if="!editMode && !deleteMode" v-on:click="createPemesanan" class="btn btn-primary btn-lg btn-block" type="submit">Submit Data</button>
+                  <button v-if="editMode" v-on:click="updatePemesanan" class="btn btn-warning btn-lg btn-block" type="submit">Update Data</button>
+                  <button v-if="deleteMode" v-on:click="deletePemesanan" class="btn btn-danger btn-lg btn-block" type="submit">Delete Data</button>
+                  
+                </form>
+              </div>
+            </div>
+
+            <footer class="my-5 pt-5 text-muted text-center text-small">
+                <ul class="list-inline">
+                  <li class="list-inline-item"><a href="#">Privacy</a></li>
+                  <li class="list-inline-item"><a href="#">Terms</a></li>
+                  <li class="list-inline-item"><a href="#">Support</a></li>
+                </ul>
+              </footer>
+
+    </div>
+    
+
+    <!-- Axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script>
+        var app = new Vue ({
+            el: '#app',
+            data: {
+                errors: [],
+                message: null,
+                pemesanans:[],
+                pemesananIdEdit: null,
+                pemesananIdDelete: null,
+                editMode: false,
+                deleteMode: false,
+                nama: '',
+                noKamar: '',
+                gedung: '',
+                foto: '',
+            },
+            mounted: function() {
+                this.getPemesanan();
+            },
+            methods: {
+                getPemesanan() {
+                    axios.get('https://622433de3af069a0f9b0cab7.mockapi.io//pemesanan')
+                        .then(response => {
+                            this.pemesanans = response.data;
+                            console.log(response);
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
+                },
+                createPemesanan: function(){
+                    axios.post('https://622433de3af069a0f9b0cab7.mockapi.io/pemesanan', {
+                        nama: this.nama,
+                        noKamar: this.noKamar,
+                        gedung: this.gedung,
+                        foto: this.foto,
+                    })
+                    .then(response => {
+                            this.getPemesanan();
+                            this.message = "Your data has been submitted";
+                            console.log(response);
+                    })
+                    .catch(error => {
+                            console.log(error);
+                    });
+                },
+                resetForm: function () {
+                    this.message = null;
+                    this.editMode = false;
+                    this.deleteMode = false;
+                    this.pemesananIdEdit = null;
+                    this.nama = null;
+                    this.noKamar = null;
+                    this.gedung = null;
+                    this.foto = null;
+                },
+                getEdit: function (pemesanan) {
+                    this.message = null;
+                    this.editMode = true;
+                    this.deleteMode = false;
+                    this.pemesananIdEdit = pemesanan.id;
+                    this.nama = pemesanan.nama;
+                    this.noKamar = pemesanan.noKamar;
+                    this.gedung = pemesanan.gedung;
+                    this.foto = pemesanan.foto;
+                },
+                getDelete: function (pemesanan) {
+                    this.message = null;
+                    this.deleteMode = true;
+                    this.editMode = false;
+                    this.pemesananIdDelete = pemesanan.id;
+                    this.nama = pemesanan.nama;
+                    this.noKamar = pemesanan.noKamar;
+                    this.gedung = pemesanan.gedung;
+                    this.foto = pemesanan.foto;
+                },
+                updatePemesanan: function () {
+                    axios.put(`https://622433de3af069a0f9b0cab7.mockapi.io//pemesanan/${this.pemesananIdEdit}`, {
+                            nama: this.nama,
+                            noKamar: this.noKamar,
+                            gedung: this.gedung,
+                            foto: this.foto,
+                        })
+                        .then(res => {
+                            // handle success
+                            this.message = "Your data has been updated";
+                            this.getPemesanan();
+                        })
+                        .catch(err => {
+                            // handle error
+                            console.log(err);
+                        })
+                },
+                // Delete pemesanan
+                deletePemesanan: function () {
+                    axios.delete(`https://622433de3af069a0f9b0cab7.mockapi.io/pemesanan/${this.pemesananIdDelete}`)
+                        .then(res => {
+                            // handle success
+                            this.message = "Your data has been deleted";
+                            this.getPemesanan();
+                        })
+                        .catch(err => {
+                            // handle error
+                            console.log(err);
+                        })
+                }
+            }
+        })
+        
+    </script>
+
+
+</body>
+</html>
